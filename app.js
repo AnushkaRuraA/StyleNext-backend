@@ -51,8 +51,8 @@ const connectDB = async () => {
         cached.conn = await cached.promise;
     } catch (e) {
         cached.promise = null;
-        console.error('MongoDB connection error:', e.message);
-        throw e;
+        console.warn('⚠️ MongoDB connection failed, but proceeding since we are using Firebase:', e.message);
+        return null; // Return null instead of throwing
     }
 
     return cached.conn;
