@@ -6,9 +6,18 @@ import { dirname, join } from 'path';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const serviceAccount = JSON.parse(
-  readFileSync(join(__dirname, '../serviceAccountKey.json'), 'utf8')
-);
+// Production (Render): read from environment variable
+// Local dev: fall back to serviceAccountKey.json file
+let serviceAccount;
+if (process.env.FIREBASE_SERVICE_ACCOUNT_JSON) {
+  serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_JSON);
+  console.log('Firebase Admin: using env var credentials');
+} else {
+  serviceAccount = JSON.parse(
+    readFileSync(join(__dirname, '../serviceAccountKey.json'), 'utf8')
+  );
+  console.log('Firebase Admin: using local serviceAccountKey.json');
+}
 
 if (!admin.apps.length) {
   admin.initializeApp({
