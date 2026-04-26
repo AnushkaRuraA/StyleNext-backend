@@ -64,7 +64,10 @@ import authRoutes from './routes/authRoutes.js';
 
 // Middlewares
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+  origin: process.env.FRONTEND_URL || '*',
+  credentials: true
+}));
 
 // Custom Morgan logger for API req/res details
 app.use(morgan((tokens, req, res) => {
