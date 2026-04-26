@@ -1,4 +1,6 @@
+import 'dotenv/config';
 import admin from 'firebase-admin';
+
 
 // Build service account from individual environment variables
 // (works both locally via .env and on Render via dashboard env vars)
