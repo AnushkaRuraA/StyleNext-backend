@@ -12,9 +12,26 @@ const app = express();
 const server = http.createServer(app);
 
 // Socket.io initialization
+const allowedOrigins = [process.env.FRONTEND_URL, 'http://localhost:3000', 'https://stylenext.vercel.app'].filter(Boolean);
+
+const isOriginAllowed = (origin) => {
+  if (!origin) return true; // Allow non-browser requests (like Postman or server-to-server)
+  if (allowedOrigins.includes(origin)) return true;
+  
+  // Allow Vercel preview deployments (e.g., style-next-xxx.vercel.app)
+  const vercelPreviewRegex = /^https:\/\/style-next-.*\.vercel\.app$/;
+  return vercelPreviewRegex.test(origin);
+};
+
 const io = new Server(server, {
   cors: {
-    origin: process.env.FRONTEND_URL || '*',
+    origin: (origin, callback) => {
+      if (isOriginAllowed(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
     methods: ['GET', 'POST'],
   },
 });
@@ -65,7 +82,13 @@ import authRoutes from './routes/authRoutes.js';
 // Middlewares
 app.use(express.json());
 app.use(cors({
-  origin: process.env.FRONTEND_URL || '*',
+  origin: (origin, callback) => {
+    if (isOriginAllowed(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true
 }));
 
